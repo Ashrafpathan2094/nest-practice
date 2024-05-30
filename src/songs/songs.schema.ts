@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type SongsDocument = HydratedDocument<Songs>;
 
@@ -8,7 +8,7 @@ export class Songs {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ type: [String], required: true })
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Artist' }])
   artist: string[];
 
   @Prop({ required: true })
