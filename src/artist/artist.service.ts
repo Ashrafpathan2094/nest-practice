@@ -28,8 +28,39 @@ export class ArtistService {
     }
   }
 
-  findAll() {
-    return `This action returns all artist`;
+  async findAll() {
+    try {
+      const allArtists = await this.ArtistModel.aggregate([
+        {
+          $lookup: {
+            from: 'songs', // The collection name in MongoDB (usually the plural of the model name)
+            localField: 'songs', // The field in the artist document
+            foreignField: '_id', // The field in the song document
+            as: 'songsList', // The name of the new array field with song details
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            genre: 1,
+            songsList: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          },
+        },
+      ]).exec();
+      if (!allArtists) {
+        throw new BadRequestException(
+          'An error occurred while finding all artists: ',
+        );
+      }
+      return allArtists;
+    } catch (error) {
+      console.log('error', error);
+      throw new BadRequestException(
+        'An error occurred while finding all artists: ',
+      );
+    }
   }
 
   findOne(id: number) {
